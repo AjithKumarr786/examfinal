@@ -1,1 +1,49 @@
 
+name: Bug Report
+description: Submit a bug report
+title: "[BUG]: "
+labels:
+  - bug
+
+body:
+  - type: input
+    id: username
+    attributes:
+      label: Username
+      placeholder: Enter your username
+    validations:
+      required: true
+
+  - type: input
+    id: email
+    attributes:
+      label: Email
+      placeholder: Enter your email
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options:
+        - Development
+        - QA
+        - Staging
+        - Production
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      placeholder: Describe the bug...
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: I confirm the information is correct.
+          required: true
