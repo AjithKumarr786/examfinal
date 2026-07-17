@@ -43,6 +43,7 @@ jobs:
           echo "Issue URL          : ${{ github.event.issue.html_url }}"
           echo "Issue State        : ${{ github.event.issue.state }}"
           echo "Issue Created At   : ${{ github.event.issue.created_at }}"
+          echo "Issue Created At   : ${{ github.event.sender.email }}"
           echo ""
 
           echo "========== ISSUE CREATOR =========="
