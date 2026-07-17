@@ -1,1 +1,55 @@
 
+name: Debug Issue Form
+
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print GitHub Context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "========== GITHUB CONTEXT =========="
+          echo "$GITHUB_CONTEXT"
+
+      - name: Print Event Payload
+        run: |
+          echo "========== EVENT PAYLOAD =========="
+          cat "$GITHUB_EVENT_PATH"
+
+      - name: Print Common Variables
+        run: |
+          echo ""
+          echo "========== COMMON VARIABLES =========="
+          echo "Actor              : ${{ github.actor }}"
+          echo "Triggering Actor   : ${{ github.triggering_actor }}"
+          echo "Repository         : ${{ github.repository }}"
+          echo "Repository Owner   : ${{ github.repository_owner }}"
+          echo "Workflow           : ${{ github.workflow }}"
+          echo "Run ID             : ${{ github.run_id }}"
+          echo "Run Number         : ${{ github.run_number }}"
+          echo "Event Name         : ${{ github.event_name }}"
+          echo ""
+
+          echo "========== ISSUE =========="
+          echo "Issue Number       : ${{ github.event.issue.number }}"
+          echo "Issue Title        : ${{ github.event.issue.title }}"
+          echo "Issue URL          : ${{ github.event.issue.html_url }}"
+          echo "Issue State        : ${{ github.event.issue.state }}"
+          echo "Issue Created At   : ${{ github.event.issue.created_at }}"
+          echo ""
+
+          echo "========== ISSUE CREATOR =========="
+          echo "Login              : ${{ github.event.issue.user.login }}"
+          echo "ID                 : ${{ github.event.issue.user.id }}"
+          echo "Type               : ${{ github.event.issue.user.type }}"
+          echo ""
+
+          echo "========== ISSUE BODY =========="
+          echo "${{ github.event.issue.body }}"
