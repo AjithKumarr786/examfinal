@@ -96,6 +96,8 @@ jobs:
           echo "Context:     ${{ steps.vars.outputs.context }}"
           echo "Context IDs: ${{ steps.vars.outputs.context_ids }}"
           echo "All Courses: ${{ steps.vars.outputs.all_courses }}"
+          echo "prod_confirmation : ${{ steps.vars.outputs.prod_confirmation }}"
+          echo "module_rollup :  ${{ steps.vars.outputs.module_rollup }}"
           echo "========================================="
 
       # 5. Comment success on the issue if triggered by issue
