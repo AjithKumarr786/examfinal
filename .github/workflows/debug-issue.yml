@@ -44,6 +44,7 @@ jobs:
           echo "Issue State        : ${{ github.event.issue.state }}"
           echo "Issue Created At   : ${{ github.event.issue.created_at }}"
           echo "Issue Created At   : ${{ github.event.sender.email }}"
+         
           echo ""
 
           echo "========== ISSUE CREATOR =========="
@@ -54,3 +55,4 @@ jobs:
 
           echo "========== ISSUE BODY =========="
           echo "${{ github.event.issue.body }}"
+          
