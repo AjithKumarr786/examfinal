@@ -75,7 +75,10 @@ jobs:
           ALL_COURSES="${{ steps.parse.outputs.issueparser_all_courses || inputs.all_courses }}"
           ENVIRONMENT="${{ steps.parse.outputs.issueparser_environment || inputs.environment }}"
           prod_confirmation="${{ steps.parse.outputs.prod_confirmation }}"
-          module_rollup="${{ steps.parse.outputs.module_rollup }}"
+          MODULE_ROLL="${{ steps.parse.outputs.module_rollup}}"
+
+         
+            
 
           if [ "$ALL_COURSES" = "true" ]; then
             ALL_COURSES="true"
@@ -87,7 +90,7 @@ jobs:
           echo "context_ids=$CONTEXT_IDS" >> $GITHUB_OUTPUT
           echo "all_courses=$ALL_COURSES" >> $GITHUB_OUTPUT
           echo "environment=$ENVIRONMENT" >> $GITHUB_OUTPUT
-
+          echo "module=$MODULE_ROLL" >> $GITHUB_OUTPUT
       # 4. Print all extracted values to the workflow log
       - name: Print Consolidated Inputs
         run: |
