@@ -74,6 +74,8 @@ jobs:
           CONTEXT_IDS="${{ steps.parse.outputs.issueparser_context_ids || inputs.context_ids }}"
           ALL_COURSES="${{ steps.parse.outputs.issueparser_all_courses || inputs.all_courses }}"
           ENVIRONMENT="${{ steps.parse.outputs.issueparser_environment || inputs.environment }}"
+          prod_confirmation="${{ steps.parse.outputs.prod_confirmation }}"
+          module_rollup="${{ steps.parse.outputs.module_rollup }}"
 
           if [ "$ALL_COURSES" = "true" ]; then
             ALL_COURSES="true"
