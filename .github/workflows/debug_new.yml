@@ -1,0 +1,39 @@
+name: Debug Issue Form Inputs
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Parse Issue Form
+        id: parse
+        uses: stefanbuck/github-issue-parser@v3
+        with:
+          template-path: .github/ISSUE_TEMPLATE/issue-ops-update-wistia-page-titles.yml
+
+      - name: Print parsed outputs
+        run: |
+          echo "===== RAW ISSUE BODY ====="
+          echo "${{ github.event.issue.body }}"
+
+          echo ""
+          echo "===== PARSED OUTPUTS ====="
+          echo "environment: '${{ steps.parse.outputs.issueparser_environment }}'"
+          echo "update_pages_for: '${{ steps.parse.outputs.issueparser_update_pages_for }}'"
+          echo "course_ids: '${{ steps.parse.outputs.issueparser_course_ids }}'"
+          echo "module_rollup: '${{ steps.parse.outputs.issueparser_module_rollup }}'"
+          echo "prod_confirmation: '${{ steps.parse.outputs.issueparser_prod_confirmation }}'"
+
+      - name: Check checkbox state
+        run: |
+          VALUE="${{ steps.parse.outputs.issueparser_module_rollup }}"
+
+          if [ "$VALUE" = "true" ] || [ "$VALUE" = "on" ]; then
+            echo "Checkbox is CHECKED"
+          else
+            echo "Checkbox is UNCHECKED"
+          fi
