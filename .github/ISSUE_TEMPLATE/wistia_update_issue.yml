@@ -1,16 +1,16 @@
 name: "Canvas: Add Video Run Time"
 description: "GitHub Job Name* (Required) : Enter a descriptive program or course name between the parentheses. REQUIRED. The unique identifier for this update job."
 title: "Canvas: Video Run Times (e.g., Fordham Law)"
-labels: ["canvas", "video-run-time"]
+labels:
+  - update-wistia-page-titles
 body:
-  # - type: input
-  #   id: job_name
-  #   attributes:
-  #     label: "GitHub Job Name* (Required)"
-  #     description: "Enter a descriptive program or course name between the parentheses."
-  #     placeholder: "Canvas: Video Run Times (e.g., Fordham Law)"
-  #   validations:
-  #     required: true
+  - type: markdown
+    attributes:
+      value: |
+        ## GitHub Job Name* (Required)
+        Enter a descriptive program or course name between the parentheses.
+
+        **Example:** Canvas: Video Run Times (e.g., Fordham Law)
 
   - type: dropdown
     id: environment
@@ -18,16 +18,16 @@ body:
       label: "Select Canvas Environment"
       description: "Which Environment in Canvas? 'PROD' updates live courses. 'BETA' updates the testing environment."
       options:
-        - "PROD"
         - "BETA"
-      default: 1
+        - "PROD"
+      default: 0
     validations:
       required: true
 
   - type: dropdown
     id: update_pages_for
     attributes:
-      label: "Update Pages For:"
+      label: "Specify Course Scope"
       options:
         - "Entire Program"
         - "Specific Course(s) Only"
@@ -38,19 +38,17 @@ body:
     id: course_ids
     attributes:
       label: "Account ID or Course ID(s)"
-      description: 'For "Entire Program", enter the desired Account ID. For "Course(s) Only", enter the Course ID(s).'
+      description: |
+        For "Entire Program", enter the desired Account ID. For "Course(s) Only", enter the Course ID(s).
+
+        ℹ️ *Note:*
+
+        **For Entire Program**: Find the Account ID in the URL: `digitalcampus.instructure.com/accounts/[Account_ID]` (e.g., `192` from `.../accounts/192`)
+
+        **For Specific Course(s) Only**: Find the Course ID in the URL: `digitalcampus.instructure.com/courses/[Course_ID]` (e.g., `54278` from `.../courses/54278`)
       placeholder: "e.g., 192 or 39005, 39006, 459"
     validations:
       required: true
-
-  - type: markdown
-    attributes:
-      value: |
-        > ℹ️ **Note:**
-        >
-        > **For Entire Program**: Find the Account ID in the URL: `digitalcampus.instructure.com/accounts/[Account_ID]` (e.g., `192` from `.../accounts/192`)
-        >
-        > **For Specific Course(s) Only**: Find the Course ID in the URL: `digitalcampus.instructure.com/courses/[Course_ID]` (e.g., `54278` from `.../courses/54278`)
 
   - type: checkboxes
     id: module_rollup
