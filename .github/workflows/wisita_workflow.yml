@@ -1,0 +1,168 @@
+name: Update Wistia Page Titles
+
+on:
+  # Trigger 1: Automatic via Issue Form
+  issues:
+    types: [labeled]
+
+  # Triggered manually via the GitHub Actions UI.
+  # Sends a message to Amazon SQS to trigger the Wistia page title update processing.
+  workflow_dispatch:
+    inputs:
+      context:
+        description: "Context type (course or account)"
+        required: true
+        type: choice
+        options:
+          - course
+          - account
+        default: account
+      context_ids:
+        description: "Single ID or comma-separated list of course/account IDs"
+        required: true
+        type: string
+      all_courses:
+        description: "Process all courses (not just blueprints)"
+        required: false
+        type: boolean
+        default: true
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        options:
+          - prod
+          - stg
+        default: prod
+
+env:
+  AWS_REGION: us-west-2
+
+jobs:
+  update-wistia-page-titles-sqs:
+    runs-on: 2uinc-mgmt
+    permissions:
+      id-token: write
+      contents: read
+      issues: write
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.issue.labels.*.name, 'update-wistia-page-titles') ||
+      contains(github.event.issue.labels.*.name, 'update-wistia-page-titles-prod')
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+        # 1. Parse the issue form (this step is skipped if triggered manually)
+      - name: Parse Issue Form Body
+        if: github.event_name == 'issues'
+        id: parse
+        uses: stefanbuck/github-issue-parser@v3
+        with:
+          template-path: ${{ contains(github.event.issue.labels.*.name, 'update-wistia-page-titles-prod') && '.github/ISSUE_TEMPLATE/issue-update-wistia-page-titles-prod.yml' || '.github/ISSUE_TEMPLATE/issue-ops-update-wistia-page-titles.yml' }}
+
+
+      # 2. Set unified environment variables from either source
+      - name: Consolidate Inputs
+        id: vars
+        run: |
+          # If triggered by issue, use parsed output. If manual, use input.
+          CONTEXT="${{ steps.parse.outputs.issueparser_context || inputs.context }}"
+          CONTEXT_IDS="${{ steps.parse.outputs.issueparser_context_ids || inputs.context_ids }}"
+          ALL_COURSES="${{ steps.parse.outputs.issueparser_all_courses || inputs.all_courses }}"
+          ENVIRONMENT="${{ steps.parse.outputs.issueparser_environment || inputs.environment }}"
+
+          # Convert string "true"/"false" to boolean for consistency
+          if [ "$ALL_COURSES" = "true" ]; then
+            ALL_COURSES="true"
+          else
+            ALL_COURSES="false"
+          fi
+
+          echo "context=$CONTEXT" >> $GITHUB_OUTPUT
+          echo "context_ids=$CONTEXT_IDS" >> $GITHUB_OUTPUT
+          echo "all_courses=$ALL_COURSES" >> $GITHUB_OUTPUT
+          echo "environment=$ENVIRONMENT" >> $GITHUB_OUTPUT
+
+      - name: Configure AWS credentials
+        uses: 2uinc/gha-workflows/.github/actions/assume_repo_role@main
+        with:
+          AWS_REGION: ${{ env.AWS_REGION }}
+          AWS_ACCOUNT_NAME: degrees-prod
+
+      - name: Send Message to SQS Queue
+        run: |
+          # 1. Generate a unique run ID for tracking/deduplication if needed
+          UNIQUE_RUN_ID="${{ github.run_id }}-${{ github.run_attempt }}"
+
+          # 2. Construct the JSON payload with the required inputs
+          PAYLOAD=$(cat <<EOF
+          {
+            "context": "${{ steps.vars.outputs.context }}",
+            "contextIds": "${{ steps.vars.outputs.context_ids }}",
+            "allCourses": ${{ steps.vars.outputs.all_courses }}
+            "module_rollup" : ${{ steps.vars.outputs.module_rollup }}
+          }
+          EOF
+          )
+
+          echo "Sending payload to SQS..."
+          echo "$PAYLOAD"
+
+          QUEUE_URL="https://sqs.${{ env.AWS_REGION }}.amazonaws.com/127579856528/canvas-analytics-lti-wistia-page-title-update-sqs-${{ steps.vars.outputs.environment }}"
+
+          echo "✅ Message sent successfully to $QUEUE_URL"
+
+      - name: Comment success on issue
+        if: github.event_name == 'issues' && success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: [
+                '✅ IssueOps workflow ran successfully.',
+                `- Triggered by: @${context.actor}`,
+                `- Label matched: \`${(context.payload.issue.labels || []).find(l => ['update-wistia-page-titles','update-wistia-page-titles-prod'].includes(l.name))?.name || 'unknown'}\``,
+                `- Environment: \`${{ steps.vars.outputs.environment }}\``,
+                `- Context: \`${{ steps.vars.outputs.context }}\``,
+                `- Context IDs: \`${{ steps.vars.outputs.context_ids }}\``,
+                `- All Courses: \`${{ steps.vars.outputs.all_courses }}\``,
+              ].join('\n')
+            });
+
+      - name: Close issue on success
+        if: github.event_name == 'issues' && success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: 'closed',
+              state_reason: 'completed'
+            });
+
+      - name: Comment failure on issue
+        if: github.event_name == 'issues' && failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: [
+                '❌ **Wistia Page Title Update Workflow Failed**',
+                `- **Triggered by**: @${context.actor}`,
+                `- **Environment**: \`${{ steps.vars.outputs.environment }}\``,
+                `- **Context**: \`${{ steps.vars.outputs.context }}\``,
+                `- **Context IDs**: \`${{ steps.vars.outputs.context_ids }}\``,
+                `- **All Courses**: \`${{ steps.vars.outputs.all_courses }}\``,
+                `- **Run ID**: ${{ github.run_id }}`,
+                '[View workflow run for details](' + context.payload.repository.html_url + '/actions/runs/' + context.runId + ')'
+              ].join('\n')
+            });
