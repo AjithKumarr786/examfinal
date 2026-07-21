@@ -47,3 +47,11 @@ body:
       options:
         - label: I confirm the information is correct.
           required: true
+          
+  - type: checkboxes
+    id: prod_confirmation
+    attributes:
+      label: "ATTENTION: PRODUCTION CONFIRMATION"
+      options:
+        - label: 'I acknowledge that by checking "PROD" above, this action will update live production pages in Canvas.'
+          required: true
