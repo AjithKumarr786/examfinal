@@ -7,10 +7,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        ## GitHub Job Name* (Required)
-        Enter a descriptive program or course name between the parentheses.
-
-        **Example:** Canvas: Video Run Times (e.g., Fordham Law)
+        ℹ️ **GitHub Job Name** (Required): Enter a descriptive program or course name between the parentheses. **Example:** Canvas: Video Run Times (e.g., Fordham Law)
 
   - type: dropdown
     id: environment
