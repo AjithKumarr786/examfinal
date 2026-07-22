@@ -1,133 +1,31 @@
-name: Print Issue Inputs Workflow
+name: Test Issue Form Values
 
 on:
-  # Trigger 1: Automatic via Issue Form
   issues:
     types: [labeled]
 
-  # Trigger 2: Manual execution via GitHub Actions UI
-  workflow_dispatch:
-    inputs:
-      context:
-        description: "Context type (course or account)"
-        required: true
-        type: choice
-        options:
-          - course
-          - account
-        default: account
-      context_ids:
-        description: "Single ID or comma-separated list of course/account IDs"
-        required: true
-        type: string
-      all_courses:
-        description: "Process all courses (not just blueprints)"
-        required: false
-        type: boolean
-        default: true
-      environment:
-        description: "Target environment"
-        required: true
-        type: choice
-        options:
-          - prod
-          - stg
-        default: prod
-
 jobs:
-  print-issue-inputs:
-    # Changed from custom runner to standard GitHub-hosted runner
+  print-values:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
-      contents: read
 
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      contains(github.event.issue.labels.*.name, 'update-wistia-page-titles') ||
-      contains(github.event.issue.labels.*.name, 'update-wistia-page-titles-prod')
+    # Only run when the specific label is added
+    if: contains(github.event.issue.labels.*.name, 'update-wistia-page-titles')
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 1. Dump raw issue payload to inspect unprocessed body
-      - name: Print Raw Issue Body
-        if: github.event_name == 'issues'
-        run: |
-          echo "=== Raw Issue Body ==="
-          echo "${{ github.event.issue.body }}"
-
-      # 2. Parse issue form fields (skipped if triggered manually)
       - name: Parse Issue Form Body
-        if: github.event_name == 'issues'
         id: parse
         uses: stefanbuck/github-issue-parser@v3
         with:
-          template-path: ${{ contains(github.event.issue.labels.*.name, 'update-wistia-page-titles-prod') && '.github/ISSUE_TEMPLATE/issue-update-wistia-page-titles-prod.yml' || '.github/ISSUE_TEMPLATE/issue-ops-update-wistia-page-titles.yml' }}
+          template-path: .github/ISSUE_TEMPLATE/issue-ops-update-wistia-page-titles.yml
 
-      # 3. Consolidate inputs from either Issue Form or manual dispatch
-      - name: Consolidate Inputs
-        id: vars
+      - name: Print parsed issue form values
         run: |
-          CONTEXT="${{ steps.parse.outputs.issueparser_context || inputs.context }}"
-          CONTEXT_IDS="${{ steps.parse.outputs.issueparser_context_ids || inputs.context_ids }}"
-          ENVIRONMENT="${{ steps.parse.outputs.issueparser_environment || inputs.environment }}"
-          prod_confirmation="${{ steps.parse.outputs.prod_confirmation }}"
-          MODULE_ROLL="${{ steps.parse.outputs.module_rollup}}"
-
-          echo "context=$CONTEXT" >> $GITHUB_OUTPUT
-          echo "context_ids=$CONTEXT_IDS" >> $GITHUB_OUTPUT
-          echo "all_courses=$ALL_COURSES" >> $GITHUB_OUTPUT
-          echo "environment=$ENVIRONMENT" >> $GITHUB_OUTPUT
-          echo "module=$MODULE_ROLL" >> $GITHUB_OUTPUT
-          echo "prod_confirmation : ${{ steps.parse.outputs.prod_confirmation }}"
-          echo "module_rollup : ${{ steps.parse.outputs.module_rollup}}"
-          
-      # 4. Print all extracted values to the workflow log
-      - name: Print Consolidated Inputs
-        run: |
-          echo "========================================="
-          echo "         EXTRACTED WORKFLOW INPUTS       "
-          echo "========================================="
-          echo "Environment: ${{ steps.vars.outputs.environment }}"
-          echo "Context:     ${{ steps.vars.outputs.context }}"
-          echo "Context IDs: ${{ steps.vars.outputs.context_ids }}"
-          echo "All Courses: ${{ steps.vars.outputs.all_courses }}"
-          echo "prod_confirmation : ${{ steps.vars.outputs.prod_confirmation }}"
-          echo "module_rollup :  ${{ steps.vars.outputs.module_rollup }}"
-          echo "========================================="
-
-      # 5. Comment success on the issue if triggered by issue
-      - name: Comment success on issue
-        if: github.event_name == 'issues' && success()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: [
-                '✅ **Issue Form Inputs Parsed Successfully**',
-                `- **Triggered by**: @${context.actor}`,
-                `- **Environment**: \`${{ steps.vars.outputs.environment }}\``,
-                `- **Context**: \`${{ steps.vars.outputs.context }}\``,
-                `- **Context IDs**: \`${{ steps.vars.outputs.context_ids }}\``,
-                `- **All Courses**: \`${{ steps.vars.outputs.all_courses }}\``
-              ].join('\n')
-            });
-
-      # 6. Close the issue on completion
-      - name: Close issue on success
-        if: github.event_name == 'issues' && success()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.issues.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              state: 'closed',
-              state_reason: 'completed'
-            });
+          echo "===== Parsed Issue Form Values ====="
+          echo "Course IDs: ${{ steps.parse.outputs.issueparser_course_ids }}"
+          echo "Update Pages For: ${{ steps.parse.outputs.issueparser_update_pages_for }}"
+          echo "Environment: ${{ steps.parse.outputs.issueparser_environment }}"
+          echo "Module Rollup: ${{ steps.parse.outputs.issueparser_module_rollup }}"
+          echo "===================================="
