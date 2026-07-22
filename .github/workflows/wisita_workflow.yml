@@ -13,28 +13,31 @@ jobs:
 
     steps:
       - name: Print raw issue body
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
         run: |
           echo "===== RAW ISSUE BODY ====="
-          echo '${{ github.event.issue.body }}'
+          echo "$ISSUE_BODY"
           echo "=========================="
 
       - name: Extract form values
         id: extract
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
         run: |
-          BODY='${{ github.event.issue.body }}'
+          # 1. Parse the first non-empty line following each section heading
+          ENVIRONMENT=$(echo "$ISSUE_BODY" | awk '/### Environment/{flag=1; next} flag && NF {print; exit}')
+          SCOPE=$(echo "$ISSUE_BODY" | awk '/### Scope/{flag=1; next} flag && NF {print; exit}')
+          COURSE_IDS=$(echo "$ISSUE_BODY" | awk '/### Program ID or Course ID\(s\)/{flag=1; next} flag && NF {print; exit}')
 
-          # Extract values from the issue form markdown
-          ENVIRONMENT=$(echo "$BODY" | awk '/### Environment/{getline; print}')
-          SCOPE=$(echo "$BODY" | awk '/### Scope/{getline; print}')
-          COURSE_IDS=$(echo "$BODY" | awk '/### Program ID or Course ID\\(s\\)/{getline; print}')
-
-          # Detect checkbox selection
-          if echo "$BODY" | grep -q "Update Modules"; then
+          # 2. Check if the checkbox is actively checked ([x])
+          if echo "$ISSUE_BODY" | grep -Eq '\[x\].*Update Modules'; then
             MODULE_ROLLUP="true"
           else
             MODULE_ROLLUP="false"
           fi
 
+          # 3. Save variables to GITHUB_OUTPUT
           echo "environment=$ENVIRONMENT" >> $GITHUB_OUTPUT
           echo "scope=$SCOPE" >> $GITHUB_OUTPUT
           echo "course_ids=$COURSE_IDS" >> $GITHUB_OUTPUT
