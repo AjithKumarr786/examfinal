@@ -1,31 +1,63 @@
-name: Test Issue Form Values
+name: "[DEV] Canvas: Update Page Names with Run Times"
+description: "Enter a name for this job between the parentheses, e.g., Fordham Law, MCID, etc..."
+title: "Canvas Update Video Run Times (e.g., MCID)"
+labels:
+  - update-wistia-page-titles
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Enter a name for this job between the parentheses, e.g., Fordham Law, MCID, etc..
 
-on:
-  issues:
-    types: [labeled]
+  - type: dropdown
+    id: environment
+    attributes:
+      label: "Environment"
+      description: "Select the Canvas environment you want to update.  NOTE : Updating Prod will be a student/partner-facing action"
+      options:
+        - "Canvas Beta"
+        - "Canvas Prod (student-facing)"
+        - "Dev"
+      default: 0
+    validations:
+      required: true
 
-jobs:
-  print-values:
-    runs-on: ubuntu-latest
+  - type: dropdown
+    id: update_pages_for
+    attributes:
+      label: "Scope"
+      description: |
+        Select the scope for which you want to update page names in Canvas:  by program, or by course?
 
-    # Only run when the specific label is added
-    if: contains(github.event.issue.labels.*.name, 'update-wistia-page-titles')
+        For program: select By Program from the dropdown, enter the Account ID found in the URL of the desired program in Canvas; e.g., 192 from https://digitalcampus.instructure.com/accounts/192
 
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+        For course(s): select By Course(s) and enter the Course ID (or comma-separated Course IDs) found in the URL of the desired course in Canvas; e.g., 54278 from https://digitalcampus.instructure.com/courses/54278”
+      options:
+        - "By Program"
+        - "By Course(s)"
+    validations:
+      required: true
 
-      - name: Parse Issue Form Body
-        id: parse
-        uses: stefanbuck/github-issue-parser@v3
-        with:
-          template-path: .github/ISSUE_TEMPLATE/issue-ops-update-wistia-page-titles.yml
+  - type: input
+    id: course_ids
+    attributes:
+      label: "Program ID or Course ID(s)"
+      placeholder: "e.g., 39005, 39006, 459, 27199"
+    validations:
+      required: true
 
-      - name: Print parsed issue form values
-        run: |
-          echo "===== Parsed Issue Form Values ====="
-          echo "Course IDs: ${{ steps.parse.outputs.issueparser_course_ids }}"
-          echo "Update Pages For: ${{ steps.parse.outputs.issueparser_update_pages_for }}"
-          echo "Environment: ${{ steps.parse.outputs.issueparser_environment }}"
-          echo "Module Rollup: ${{ steps.parse.outputs.issueparser_module_rollup }}"
-          echo "===================================="
+  - type: checkboxes
+    id: module_rollup
+    attributes:
+      label: "Optional: Update Module names also with cumulative run time"
+      options:
+        - label: "Update Modules"
+          required: false
+
+  - type: checkboxes
+    id: prod_confirmation
+    attributes:
+      label: "ATTENTION!!"
+      options:
+        - label: 'If the PROD is checked above, I acknowledge that this action will update production pages in Canvas.'
+          required: true
