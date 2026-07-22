@@ -8,7 +8,7 @@ body:
     attributes:
       value: |
         Enter a name for this job between the parentheses, e.g., Fordham Law, MCID, etc..
- 
+
   - type: dropdown
     id: environment
     attributes:
@@ -17,26 +17,27 @@ body:
       options:
         - "Canvas Beta"
         - "Canvas Prod (student-facing)"
+        - "Dev"
       default: 0
     validations:
       required: true
- 
+
   - type: dropdown
     id: update_pages_for
     attributes:
       label: "Scope"
       description: |
         Select the scope for which you want to update page names in Canvas:  by program, or by course?
- 
+
         For program: select By Program from the dropdown, enter the Account ID found in the URL of the desired program in Canvas; e.g., 192 from https://digitalcampus.instructure.com/accounts/192
- 
+
         For course(s): select By Course(s) and enter the Course ID (or comma-separated Course IDs) found in the URL of the desired course in Canvas; e.g., 54278 from https://digitalcampus.instructure.com/courses/54278”
       options:
         - "By Program"
         - "By Course(s)"
     validations:
       required: true
- 
+
   - type: input
     id: course_ids
     attributes:
@@ -44,7 +45,7 @@ body:
       placeholder: "e.g., 39005, 39006, 459, 27199"
     validations:
       required: true
- 
+
   - type: checkboxes
     id: module_rollup
     attributes:
@@ -52,11 +53,11 @@ body:
       options:
         - label: "Update Modules"
           required: false
- 
+
   - type: checkboxes
     id: prod_confirmation
     attributes:
-      label: "ATTENTION"
+      label: "ATTENTION!!"
       options:
         - label: 'If the PROD is checked above, I acknowledge that this action will update production pages in Canvas.'
           required: true
