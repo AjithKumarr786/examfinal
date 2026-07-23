@@ -31,6 +31,20 @@ body:
     validations:
       required: true
 
+  - type: input
+    id: mcid
+    attributes:
+      label: "Optional: add MCID to filename"
+      description: |
+        By default, the filename will appear with the Course Name and the Course ID,
+        e.g., BP: 2026-2809 ODAT5888 Data Sleuthing | 53042 | IS_Educator Course Review
+
+        If you want the MCID to also appear in the filename, enter it here.
+        e.g., BSYD-MDA_07 | BP: 2026-2809 ODAT5888 Data Sleuthing | 53042 | IS_Educator Course Review
+      placeholder: "e.g., BSYD-MDA_07"
+    validations:
+      required: false
+
   - type: textarea
     id: notes
     attributes:
