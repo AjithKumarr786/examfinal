@@ -1,0 +1,41 @@
+name: "[DEV] Canvas: Build Educator Course Review Spreadsheet"
+description: Create an issue that can trigger the course report workflow.
+title: "[DEV] Canvas: Build Educator Course Review Spreadsheet"
+labels:
+  - run-course-report
+body:
+  - type: markdown
+    attributes:
+      value: |
+        When created with the `run-course-report` label, the `run-course-report.yml` workflow can run
+        (if the issue creator is in the allowed user list).
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: Which environment should the report target?
+      options:
+        - stg
+        - prod
+      default: 1
+    validations:
+      required: true
+
+  - type: input
+    id: course_id
+    attributes:
+      label: Course ID
+      description: Course identifier to include in the report run.
+      placeholder: number
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Optional context for this run.
+      placeholder: Include anything useful for the report.
+    validations:
+      required: false
