@@ -1,6 +1,6 @@
 name: "[DEV] Canvas: Update Page Names with Run Times"
-description: "Enter a name for this job between the parentheses, e.g., Fordham Law, MCID, etc..."
-title: "Canvas Update Video Run Times (e.g., MCID)"
+description: ""Create an issue to trigger updating Canvas Page Names with video run times."
+title: "[DEV] Canvas: Update Page Names with Run Times"
 labels:
   - update-wistia-page-titles
 body:
