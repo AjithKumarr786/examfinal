@@ -1,56 +1,63 @@
-name: "[DEV] Canvas: Build Educator Course Review Spreadsheet"
-description: Create an issue that can trigger the course report workflow.
-title: "[DEV] Canvas Educator Course Review (e.g., MCID)"
+name: "[DEV] Canvas: Update Page Names with Run Times"
+description: "Create an issue to trigger updating Canvas Page Names with video run times."
+title: "[DEV] Canvas: Update Page Names with Run Times"
 labels:
-  - run-course-report
+  - update-wistia-page-titles
 body:
   - type: markdown
     attributes:
       value: |
-        Enter a name for this job between the parentheses, e.g., MCID.
+        Enter a name for this job between the parentheses, e.g., Fordham Law, MCID, etc..
 
   - type: dropdown
     id: environment
     attributes:
-      label: Environment
-      description: Which environment should the report target?
+      label: "Environment"
+      description: "Select the Canvas environment you want to update.  NOTE : Updating Prod will be a student/partner-facing action"
       options:
-        - stg
-        - prod
-      default: 1
+        - "Canvas Beta"
+        - "Canvas Prod (student-facing)"
+        - "Dev"
+      default: 0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: update_pages_for
+    attributes:
+      label: "Scope"
+      description: |
+        Select the scope for which you want to update page names in Canvas:  by program, or by course?
+
+        For program: select By Program from the dropdown, enter the Account ID found in the URL of the desired program in Canvas; e.g., 192 from https://digitalcampus.instructure.com/accounts/192
+
+        For course(s): select By Course(s) and enter the Course ID (or comma-separated Course IDs) found in the URL of the desired course in Canvas; e.g., 54278 from https://digitalcampus.instructure.com/courses/54278”
+      options:
+        - "By Program"
+        - "By Course(s)"
     validations:
       required: true
 
   - type: input
-    id: course_id
+    id: course_ids
     attributes:
-      label: Which course? *
-      description: |
-        Enter the Course ID found in the URL in of the desired course Canvas,
-        e.g., 54278 from https://digitalcampus.instructure.com/courses/54278
-      placeholder: "e.g., 54278"
+      label: "Program ID or Course ID(s)"
+      placeholder: "e.g., 39005, 39006, 459, 27199"
     validations:
       required: true
 
-  - type: input
-    id: mcid
+  - type: checkboxes
+    id: module_rollup
     attributes:
-      label: "Optional: add MCID to filename"
-      description: |
-        By default, the filename will appear with the Course Name and the Course ID,
-        e.g., BP: 2026-2809 ODAT5888 Data Sleuthing | 53042 | IS_Educator Course Review
+      label: "Optional: Update Module names also with cumulative run time"
+      options:
+        - label: "Update Modules"
+          required: false
 
-        If you want the MCID to also appear in the filename, enter it here.
-        e.g., BSYD-MDA_07 | BP: 2026-2809 ODAT5888 Data Sleuthing | 53042 | IS_Educator Course Review
-      placeholder: "e.g., BSYD-MDA_07"
-    validations:
-      required: false
-
-  - type: textarea
-    id: notes
+  - type: checkboxes
+    id: prod_confirmation
     attributes:
-      label: Notes
-      description: Optional context for this run.
-      placeholder: Include anything useful for the report.
-    validations:
-      required: false
+      label: "ATTENTION!!"
+      options:
+        - label: 'If the PROD is checked above, I acknowledge that this action will update production pages in Canvas.'
+          required: true
