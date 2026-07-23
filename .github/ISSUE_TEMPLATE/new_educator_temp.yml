@@ -7,8 +7,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        When created with the `run-course-report` label, the `run-course-report.yml` workflow can run
-        (if the issue creator is in the allowed user list).
+        Enter a name for this job between the parentheses, e.g., MCID.
 
   - type: dropdown
     id: environment
