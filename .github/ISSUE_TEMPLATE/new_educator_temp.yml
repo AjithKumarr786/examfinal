@@ -25,9 +25,11 @@ body:
   - type: input
     id: course_id
     attributes:
-      label: Course ID
-      description: Course identifier to include in the report run.
-      placeholder: number
+      label: Which course? *
+      description: |
+        Enter the Course ID found in the URL in of the desired course Canvas,
+        e.g., 54278 from https://digitalcampus.instructure.com/courses/54278
+      placeholder: "e.g., 54278"
     validations:
       required: true
 
