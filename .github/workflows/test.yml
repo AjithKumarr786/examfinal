@@ -1,11 +1,8 @@
 name: "Test MCID Capture"
 
 on:
-  # Trigger 1: Automatic via Issue Form (opened or labeled)
   issues:
     types: [opened, labeled]
-
-  # Trigger 2: Manual trigger via GitHub Actions UI
   workflow_dispatch:
     inputs:
       course_id:
@@ -28,9 +25,10 @@ on:
 jobs:
   test-mcid-capture:
     runs-on: ubuntu-latest
+    # Robust label check using toJson()
     if: |
       github.event_name == 'workflow_dispatch' ||
-      contains(github.event.issue.labels.*.name, 'run-course-report')
+      contains(toJson(github.event.issue.labels), 'run-course-report')
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
