@@ -1,5 +1,5 @@
 # Save this in: .github/ISSUE_TEMPLATE/issue-ops-run-course-report.yml
-name: "[DEV] Canvas: Build Educator Course Review Spreadsheet"
+name: "[DEV] Canvas: Build Educator Course Review Spreadsheet1"
 description: Create an issue that can trigger the course report workflow.
 title: "[DEV] Canvas: Educator Course Review (e.g., MCID)"
 labels:
