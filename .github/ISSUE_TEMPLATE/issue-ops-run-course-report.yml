@@ -1,0 +1,48 @@
+# Save this in: .github/ISSUE_TEMPLATE/issue-ops-run-course-report.yml
+name: "[DEV] Canvas: Build Educator Course Review Spreadsheet"
+description: Create an issue that can trigger the course report workflow.
+title: "[DEV] Canvas: Educator Course Review (e.g., MCID)"
+labels:
+  - run-course-report
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Enter a name for this job between the parentheses, e.g., MCID.
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: Which environment should the report target?
+      options:
+        - stg
+        - prod
+      default: 1
+    validations:
+      required: true
+
+  - type: input
+    id: course_id
+    attributes:
+      label: Which course? *
+      description: |
+        Enter the Course ID found in the URL of the desired course Canvas
+      placeholder: "e.g., 54278"
+    validations:
+      required: true
+
+  - type: input
+    id: mcid
+    attributes:
+      label: "Optional: add MCID to filename"
+      placeholder: "e.g., BSYD-MDA_07"
+    validations:
+      required: false
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+    validations:
+      required: false
