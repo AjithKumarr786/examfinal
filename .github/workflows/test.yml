@@ -25,10 +25,7 @@ on:
 jobs:
   test-mcid-capture:
     runs-on: ubuntu-latest
-    # Robust label check using toJson()
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      contains(toJson(github.event.issue.labels), 'run-course-report')
+    # Removed the 'if:' condition so it never skips!
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
