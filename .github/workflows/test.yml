@@ -1,0 +1,78 @@
+name: "Test MCID Capture"
+
+on:
+  # Trigger 1: Automatic via Issue Form
+  issues:
+    types: [labeled]
+
+  # Trigger 2: Manual trigger via GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      course_id:
+        description: "Canvas blueprint course ID"
+        required: true
+        type: string
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        options:
+          - prod
+          - stg
+        default: prod
+      mcid:
+        description: "MCID (Optional)"
+        required: false
+        type: string
+
+jobs:
+  test-mcid-capture:
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.issue.labels.*.name, 'run-course-report')
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. Parse issue template (only if triggered by issue)
+      - name: Parse Issue Form Body
+        if: github.event_name == 'issues'
+        id: parse
+        uses: stefanbuck/github-issue-parser@v3
+        with:
+          template-path: .github/ISSUE_TEMPLATE/issue-ops-run-course-report.yml
+
+      # 2. Consolidate inputs from either source
+      - name: Consolidate Inputs
+        id: vars
+        run: |
+          COURSE_ID="${{ steps.parse.outputs.issueparser_course_id || inputs.course_id }}"
+          ENVIRONMENT="${{ steps.parse.outputs.issueparser_environment || inputs.environment }}"
+          MCID="${{ steps.parse.outputs.issueparser_mcid || inputs.mcid || '' }}"
+
+          # Auto-capture GitHub Issue URL
+          if [ "${{ github.event_name }}" = "issues" ]; then
+            ISSUE_URL="${{ github.event.issue.html_url }}"
+          else
+            ISSUE_URL="null"
+          fi
+
+          # Output variables
+          echo "course_id=$COURSE_ID" >> $GITHUB_OUTPUT
+          echo "environment=$ENVIRONMENT" >> $GITHUB_OUTPUT
+          echo "mcid=$MCID" >> $GITHUB_OUTPUT
+          echo "issue_url=$ISSUE_URL" >> $GITHUB_OUTPUT
+          echo "requester_username=${{ github.actor }}" >> $GITHUB_OUTPUT
+
+      # 3. Print parsed variables to verify MCID capture
+      - name: Print & Verify Output
+        run: |
+          echo "==============================================="
+          echo " Triggered By : ${{ github.event_name }}"
+          echo " Requester    : ${{ steps.vars.outputs.requester_username }}"
+          echo " Environment  : ${{ steps.vars.outputs.environment }}"
+          echo " Course ID    : ${{ steps.vars.outputs.course_id }}"
+          echo " MCID         : '${{ steps.vars.outputs.mcid }}'"
+          echo " Issue URL    : ${{ steps.vars.outputs.issue_url }}"
+          echo "==============================================="
