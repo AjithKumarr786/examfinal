@@ -1,6 +1,7 @@
 name: "[DEV] Canvas: Build Educator Course Review Spreadsheet"
 description: Create an issue that can trigger the course report workflow.
 title: "[DEV] Canvas: Educator Course Review (e.g., MCID)"
+placeholder: "[DEV] Canvas: Educator Course Review (e.g., MCID)"
 labels:
   - run-course-report
 body:
