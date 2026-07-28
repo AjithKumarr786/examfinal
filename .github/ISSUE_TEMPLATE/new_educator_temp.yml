@@ -15,8 +15,8 @@ body:
       label: Environment
       description: Which environment should the report target?
       options:
+        - dev
         - stg
-        - prod
       default: 1
     validations:
       required: true
@@ -24,7 +24,7 @@ body:
   - type: input
     id: course_id
     attributes:
-      label: Which course? *
+      label: Which course?
       description: |
         Enter the Course ID found in the URL of the desired course Canvas,
         e.g., 54278 from https://digitalcampus.instructure.com/courses/54278
