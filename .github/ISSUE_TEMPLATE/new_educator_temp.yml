@@ -27,7 +27,7 @@ body:
       label: Which course?
       description: |
         Enter the Course ID found in the URL of the desired course Canvas,
-        e.g., 54278 from https://digitalcampus.instructure.com/courses/54278
+        e.g., 54278 from `https://digitalcampus.instructure.com/courses/54278`
       placeholder: "e.g., 54278"
     validations:
       required: true
