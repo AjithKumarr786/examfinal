@@ -13,16 +13,6 @@ body:
 
         Add the Course title or ID to name this job.
 
-  - type: input
-    id: job_title
-    attributes:
-      label: "Job Title"
-      description: "Give this job a descriptive name"
-      placeholder: "Canvas: Mark-As Done"
-      value: "Canvas: Mark-As Done"
-    validations:
-      required: true
-
   - type: dropdown
     id: environment
     attributes:
@@ -51,4 +41,3 @@ body:
       options:
         - label: 'If the PROD is checked above, I acknowledge that this action will update production pages in Canvas'
           required: false
-
