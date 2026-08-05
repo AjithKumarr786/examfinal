@@ -2,10 +2,13 @@ name: "Canvas: Mark-As Done Script"
 description: "Update Canvas module item completion requirements for courses"
 title: "Canvas: Mark-As Done"
 labels:
-  - automation
-  - canvas
   - module-completion
 body:
+  - type: markdown
+      attributes:
+        value: |
+          Add the Course tile or ID to name this job
+
   - type: dropdown
     id: environment
     attributes:
@@ -33,4 +36,4 @@ body:
       label: "ATTENTION!"
       options:
         - label: 'If the PROD is checked above, I acknowledge that this action will update production pages in Canvas'
-          required: false
+          required: true
