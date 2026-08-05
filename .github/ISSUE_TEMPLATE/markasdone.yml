@@ -10,7 +10,7 @@ body:
     attributes:
       value: |
         ## Add a job title
-        
+
         Add the Course title or ID to name this job.
 
   - type: input
@@ -52,27 +52,3 @@ body:
         - label: 'If the PROD is checked above, I acknowledge that this action will update production pages in Canvas'
           required: false
 
-  - type: markdown
-    attributes:
-      value: |
-        ---
-        
-        ## Workflow Details
-        
-        This issue will trigger a GitHub Actions workflow that:
-        1. Parses the course IDs and environment from this issue
-        2. Creates a Kubernetes job in the specified environment
-        3. Runs the `update_module_completion_requirements.py` script
-        4. Updates module item completion requirements based on item type
-        5. Comments back on this issue with the results
-        6. Automatically closes this issue when complete
-        
-        **Script Behavior:**
-        - **Assignment (no submission)**: Sets "must_mark_done"
-        - **Assignment (with submission)**: Sets "must_submit"
-        - **Quiz**: Sets "must_submit"
-        - **Page**: Sets "must_mark_done"
-        - **Discussion**: Sets "must_contribute"
-        - **ExternalTool**: Sets "must_view"
-        
-        The script will retry up to 10 times for any items that fail to update on the first attempt.
