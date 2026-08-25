@@ -1,13 +1,13 @@
-name: "[DEV] Canvas: Mark-As Done Script"
-description: "Update Canvas module item completion requirements for courses"
-title: "[DEV] Canvas: Mark-As Done"
+name: "Canvas: Mark-As Done Script"
+description: "Update Canvas module item completion requirements for courses or account blueprint courses"
+title: "Canvas: Mark-As Done"
 labels:
   - module-completion
 body:
   - type: markdown
     attributes:
         value: |
-          Add the Course tile or ID to name this job
+          Add the Course title or Account name to name this job
 
   - type: dropdown
     id: environment
@@ -21,19 +21,40 @@ body:
     validations:
       required: true
 
+  - type: dropdown
+    id: target_type
+    attributes:
+      label: "Target Type"
+      description: "Select whether you want to update specific courses or all blueprint courses in an account"
+      options:
+        - "Course"
+        - "Account (Blueprint Courses Only)"
+      default: 0
+    validations:
+      required: true
+
   - type: input
     id: course_ids
     attributes:
-      label: "Course ID or IDs"
-      description: "Enter a single Course ID, or a comma-separated list of Course IDs. The Course ID can be found in the Canvas URL of the course or courses you want updated."
+      label: "Course ID(s)"
+      description: "Enter a single Course ID, or a comma-separated list of Course IDs. Only used if 'Course' is selected above."
       placeholder: "e.g., 39005, 39006, 45966, 27199"
     validations:
-      required: true
+      required: false
+
+  - type: input
+    id: account_id
+    attributes:
+      label: "Account ID"
+      description: "Enter a single Account ID. Only used if 'Account (Blueprint Courses Only)' is selected above. The script will process ALL blueprint courses in this account."
+      placeholder: "e.g., 12345"
+    validations:
+      required: false
 
   - type: checkboxes
     id: prod_confirmation
     attributes:
       label: "ATTENTION!"
       options:
-        - label: 'If the PROD is checked above, I acknowledge that this action will update production pages in Canvas'
+        - label: 'If PROD is checked above, I acknowledge that this action will update production pages in Canvas'
           required: true
