@@ -158,7 +158,6 @@ jobs:
       id-token: write
     env:
       IMAGE_TAG: ${{ needs.validate-inputs.outputs.image_tag }}
-      CLUSTER: ${{ env.EKS_CLUSTER_NAME }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -205,15 +204,15 @@ jobs:
         run: |
           mkdir -p "$HOME/.kube"
           aws eks update-kubeconfig \
-            --name "${CLUSTER}" \
+            --name "${{ env.EKS_CLUSTER_NAME }}" \
             --region "${{ env.AWS_REGION }}" \
-            --kubeconfig "$HOME/.kube/${CLUSTER}"
+            --kubeconfig "$HOME/.kube/${{ env.EKS_CLUSTER_NAME }}"
 
       - name: Deploy with Helm via Makefile target
         shell: bash
         run: |
           ENVIRONMENT="${{ env.ENVIRONMENT }}" \
-          CLUSTER="${CLUSTER}" \
+          CLUSTER="${{ env.EKS_CLUSTER_NAME }}" \
           IMAGE_TAG="${IMAGE_TAG}" \
           RUN_PRE_UPGRADE_JOB="${{ env.RUN_PRE_UPGRADE_JOB }}" \
           make deploy
@@ -221,7 +220,7 @@ jobs:
       - name: Rollout status
         shell: bash
         run: |
-          KUBECONFIG="$HOME/.kube/${CLUSTER}" \
+          KUBECONFIG="$HOME/.kube/${{ env.EKS_CLUSTER_NAME }}" \
           kubectl rollout status deployment/${{ env.APP_NAME }}-${{ env.ENVIRONMENT }} \
             -n ${{ env.NAMESPACE }} \
             --timeout=5m
@@ -229,8 +228,8 @@ jobs:
       - name: Verify deployed resources
         shell: bash
         run: |
-          KUBECONFIG="$HOME/.kube/${CLUSTER}" kubectl get deployment/${{ env.APP_NAME }}-${{ env.ENVIRONMENT }} -n ${{ env.NAMESPACE }}
-          KUBECONFIG="$HOME/.kube/${CLUSTER}" kubectl get pods -n ${{ env.NAMESPACE }} -l app.kubernetes.io/name=${{ env.APP_NAME }}
+          KUBECONFIG="$HOME/.kube/${{ env.EKS_CLUSTER_NAME }}" kubectl get deployment/${{ env.APP_NAME }}-${{ env.ENVIRONMENT }} -n ${{ env.NAMESPACE }}
+          KUBECONFIG="$HOME/.kube/${{ env.EKS_CLUSTER_NAME }}" kubectl get pods -n ${{ env.NAMESPACE }} -l app.kubernetes.io/name=${{ env.APP_NAME }}
 
   summary:
     needs: [validate-inputs, build-image, deploy]
